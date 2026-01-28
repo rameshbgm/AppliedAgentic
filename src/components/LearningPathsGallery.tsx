@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Bot, Workflow, Sparkles, Server, Database, ArrowRight } from "lucide-react";
@@ -37,96 +37,153 @@ interface LearningPathsGalleryProps {
     categories: CategoryData[];
 }
 
+// ... imports
 export function LearningPathsGallery({ categories }: LearningPathsGalleryProps) {
-    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [rotation, setRotation] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const lastPointerX = useRef(0);
+    const [radius, setRadius] = useState(300);
+
+    // Responsive radius
+    useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            if (width < 640) {
+                setRadius(140);
+            } else if (width < 1024) {
+                setRadius(220);
+            } else {
+                setRadius(320);
+            }
+        };
+
+        handleResize(); // Set initial
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const count = categories.length;
+    const anglePerItem = 360 / count;
+
+    const handleWheel = (e: React.WheelEvent) => {
+        if (!isPaused) return; // Only allow manual scroll if paused
+        setRotation(prev => prev + e.deltaY * 0.1); // Adjust sensitivity
+    };
+
+    const handlePointerDown = (e: React.PointerEvent) => {
+        if (e.button !== 0) return; // Only left click
+        setIsDragging(true);
+        lastPointerX.current = e.clientX;
+        containerRef.current?.setPointerCapture(e.pointerId);
+    };
+
+    const handlePointerMove = (e: React.PointerEvent) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - lastPointerX.current;
+        setRotation(prev => prev + deltaX * 0.1); // Adjust sensitivity
+        lastPointerX.current = e.clientX;
+    };
+
+    const handlePointerUp = (e: React.PointerEvent) => {
+        setIsDragging(false);
+        containerRef.current?.releasePointerCapture(e.pointerId);
+    };
+
+    // Auto-rotation loop
+    useEffect(() => {
+        let animationFrameId: number;
+
+        const animate = () => {
+            if (!isPaused && !isDragging) {
+                setRotation(prev => prev + 0.2); // Faster rotation
+            }
+            animationFrameId = requestAnimationFrame(animate);
+        };
+
+        animationFrameId = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(animationFrameId);
+    }, [isPaused, isDragging]);
 
     return (
-        <div className="w-full pt-4 pb-16">
+        <div
+            ref={containerRef}
+            className="w-full h-[350px] sm:h-[450px] relative overflow-hidden flex items-center justify-center perspective-[1000px] touch-none select-none"
+            onWheel={handleWheel}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+        >
             {/* Section Title */}
-            <div className="text-center mb-12">
-                <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white mb-4">
+            <div className="absolute top-4 sm:top-8 left-0 w-full text-center z-50 pointer-events-none px-4">
+                <h2 className="font-heading text-3xl sm:text-5xl font-bold text-white mb-2 sm:mb-4 drop-shadow-md">
                     Explore Learning Paths
                 </h2>
-                <p className="text-gray-400 max-w-2xl mx-auto text-lg px-6">
-                    Curated knowledge modules designed to take you from fundamentals to production-ready skills.
-                </p>
             </div>
 
-            {/* Cards Container */}
-            <div className="relative px-[10%] sm:px-[15%] lg:px-[20%]">
-                <div className="flex justify-center items-center gap-4">
-                    {categories.map((category, index) => {
-                        const isHovered = hoveredIndex === index;
-                        const hasHover = hoveredIndex !== null;
-                        const isBlurred = hasHover && !isHovered;
+            <div className="relative w-full h-full flex items-center justify-center transform-style-3d top-8 sm:top-12">
+                {categories.map((category, index) => {
+                    const itemAngle = (index * anglePerItem) + rotation;
+                    const radian = (itemAngle * Math.PI) / 180;
 
-                        return (
-                            <motion.div
-                                key={category.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                    scale: isHovered ? 1.08 : 1,
-                                    filter: isBlurred ? "blur(3px)" : "blur(0px)",
-                                    zIndex: isHovered ? 20 : 10,
-                                }}
-                                transition={{
-                                    type: "spring",
-                                    stiffness: 400,
-                                    damping: 30,
-                                    delay: index * 0.05,
-                                }}
-                                onMouseEnter={() => setHoveredIndex(index)}
-                                onMouseLeave={() => setHoveredIndex(null)}
-                                className="relative flex-shrink-0 w-[280px] p-6 rounded-2xl cursor-pointer
-                                    bg-white/5 backdrop-blur-xl border border-white/10
-                                    transition-colors duration-300"
-                                style={{
-                                    boxShadow: isHovered
-                                        ? `0 0 40px ${category.color}40, 0 20px 60px rgba(0,0,0,0.5)`
-                                        : "0 10px 40px rgba(0,0,0,0.2)",
-                                    marginLeft: index > 0 ? "-40px" : "0",
-                                }}
-                            >
+                    // 3D positioning
+                    const x = Math.sin(radian) * radius;
+                    const z = Math.cos(radian) * radius - radius;
+
+                    // Visibility logic
+                    const distance = Math.abs(z);
+                    const opacity = Math.max(0.1, 1 - (distance / (radius * 1.8)));
+                    const scale = Math.max(0.6, 1 - (distance / (radius * 3)));
+                    const zIndex = Math.round(100 - distance);
+
+                    return (
+                        <motion.div
+                            key={category.id}
+                            className="absolute"
+                            style={{
+                                x: x,
+                                z: z,
+                                scale: scale,
+                                opacity: opacity,
+                                zIndex: zIndex,
+                            }}
+                            onMouseEnter={() => setIsPaused(true)}
+                            onMouseLeave={() => setIsPaused(false)}
+                            onTouchStart={() => setIsPaused(true)}
+                            onTouchEnd={() => setIsPaused(false)}
+                        >
+                            <div className="w-[240px] sm:w-[280px] p-5 sm:p-6 rounded-2xl
+                                bg-white/5 backdrop-blur-xl border border-white/10
+                                shadow-2xl flex flex-col items-center text-center
+                                cursor-default">
+
                                 {/* Icon */}
                                 <div
-                                    className="w-14 h-14 rounded-xl flex items-center justify-center mb-5"
+                                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mb-4 sm:mb-5"
                                     style={{ backgroundColor: `${category.color}20` }}
                                 >
-                                    <CategoryIcon iconName={category.icon} className="w-7 h-7" color={category.color} />
+                                    <CategoryIcon iconName={category.icon} className="w-6 h-6 sm:w-7 sm:h-7" color={category.color} />
                                 </div>
 
-                                {/* Course Count Badge */}
-                                <div
-                                    className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4"
-                                    style={{ backgroundColor: `${category.color}20`, color: category.color }}
-                                >
-                                    {category.courseCount} COURSES
-                                </div>
+                                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{category.title}</h3>
+                                <p className="text-xs sm:text-sm text-gray-400 mb-4 line-clamp-2">{category.description}</p>
 
-                                {/* Title */}
-                                <h3 className="text-xl font-bold text-white mb-3 font-heading">
-                                    {category.title}
-                                </h3>
-
-                                {/* Description */}
-                                <p className="text-gray-400 text-sm mb-5 leading-relaxed">
-                                    {category.description}
-                                </p>
-
-                                {/* View Path Link */}
+                                {/* Link wraps ONLY the button part */}
                                 <Link
                                     href={`/category/${category.slug}`}
-                                    className="inline-flex items-center gap-2 text-sm font-semibold transition-all hover:gap-3"
+                                    className="flex items-center gap-2 text-xs sm:text-sm font-medium hover:underline cursor-pointer transition-all hover:scale-105 active:scale-95"
                                     style={{ color: category.color }}
+                                    onPointerDown={(e) => e.stopPropagation()}
                                 >
-                                    View Path <ArrowRight className="w-4 h-4" />
+                                    <span>View Path</span>
+                                    <ArrowRight className="w-4 h-4" />
                                 </Link>
-                            </motion.div>
-                        );
-                    })}
-                </div>
+                            </div>
+                        </motion.div>
+                    );
+                })}
             </div>
         </div>
     );
