@@ -1,8 +1,8 @@
 import prisma from "@/lib/prisma";
-import { CategoryCard } from "@/components/CategoryCard";
 import { HeroSection } from "@/app/components/HeroSection";
 import { FeaturedCourses } from "@/app/components/FeaturedCourses";
 import { Footer } from "@/app/components/Footer";
+import { LearningPathsGalleryWrapper } from "@/components/LearningPathsGalleryWrapper";
 
 export const dynamic = "force-dynamic";
 
@@ -24,37 +24,24 @@ export default async function Home() {
     c.courses.map(course => ({ ...course, categoryTitle: c.title, categoryColor: c.color }))
   ).slice(0, 6);
 
+  // Transform categories for the 3D gallery
+  const galleryCategories = categories.map(c => ({
+    id: c.id,
+    title: c.title,
+    slug: c.slug,
+    description: c.description || "Explore this learning path",
+    courseCount: c._count.courses,
+    color: c.color || "#8b5cf6",
+    icon: c.icon || "bot",
+  }));
+
   return (
     <div className="flex min-h-screen flex-col">
       <HeroSection />
 
-      {/* Categories Section */}
-      <section className="px-6 sm:px-12 lg:px-24 py-24">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-heading text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
-              Explore Learning Paths
-            </h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-              Curated knowledge modules designed to take you from fundamentals to production-ready skills.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category, idx) => (
-              <CategoryCard
-                key={category.id}
-                index={idx}
-                title={category.title}
-                slug={category.slug}
-                description={category.description || undefined}
-                count={category._count.courses}
-                color={category.color || undefined}
-                icon={category.icon || undefined}
-              />
-            ))}
-          </div>
-        </div>
+      {/* 3D Learning Paths Gallery */}
+      <section className="py-16">
+        <LearningPathsGalleryWrapper categories={galleryCategories} />
       </section>
 
       {/* Featured Courses */}
@@ -64,3 +51,4 @@ export default async function Home() {
     </div>
   );
 }
+
