@@ -1,0 +1,36 @@
+Act as a **Lead UX Engineer and Typography Specialist**. Your task is to build the **"Lesson Reader"** experience for the "Antigravity" platform (`/course/[slug]/lesson/[lesson-slug]`).
+
+This page is the core product. It must balance a **cinematic, immersive atmosphere** with **flawless readability** for long-form educational content.
+
+### 🎨 Design Philosophy: "Focus in the Void"
+The user should feel like they are reading on a floating glass tablet in deep space.
+* **Background:** A deep, animated WebGL void (handled by a global layout, assume it exists).
+* **The Slate:** The content sits inside a centralized, maximum-width container with a **heavy glassmorphism effect** (`backdrop-blur-xl`, `bg-black/40`, `border-white/10`).
+* **Distraction-Free:** No clutter. Just the content, a sticky table of contents, and navigation.
+
+### 📖 Typographic Stack (Critical)
+* **Headings:** *Space Grotesk* (Bold, Tight Tracking) — for section titles.
+* **Body Text:** *Geist Sans* or *Inter* (Regular, Leading-Relaxed, Size-LG) — specifically tuned for eye comfort over long periods.
+* **Code Blocks:** *JetBrains Mono* with a custom dark neon syntax highlighting theme.
+* **Constraint:** Use Tailwind's `@tailwindcss/typography` plugin (`prose-invert`) but heavily customized to remove default grays and use "Antigravity" neon accents (Cyan/Violet) for links and bold text.
+
+### 🛠️ Functional Requirements
+1.  **Local Progress Tracking:**
+    * Since there is no login, use a React Hook (`useLessonProgress`) to save the user's scroll position and "Completed" status to **LocalStorage**.
+    * On load, automatically scroll them to where they left off.
+2.  **Navigation:**
+    * "Previous" and "Next" buttons that float at the bottom or stick to the sides.
+    * A "Mark as Complete" button that triggers a subtle confetti/neon-glow effect.
+3.  **AI Bot Integration:**
+    * Place a floating "Ask AI" trigger (Orb) in the bottom-right corner that opens the RAG chat widget (component placeholder is fine).
+
+### 📦 Deliverables
+Please provide the production-ready code for:
+
+1.  **`app/course/[slug]/lesson/[lessonSlug]/page.tsx`:** The main server page fetching the lesson data.
+2.  **`components/reader/GlassReader.tsx`:** The reusable UI shell containing the glass effect, typography styles, and layout.
+3.  **`components/reader/ProgressBar.tsx`:** A reading progress bar attached to the top of the viewport.
+4.  **`lib/hooks/useLocalProgress.ts`:** The logic to save/load reading state without a database session.
+5.  **Tailwind Prose Config:** The specific `typography` configuration in `tailwind.config.ts` that makes the text readable, high-contrast, and aesthetically aligned with the neon theme.
+
+**Tone:** The output should be elegant, accessible, and code-perfect.

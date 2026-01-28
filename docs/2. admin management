@@ -1,0 +1,45 @@
+Act as a Principal Software Engineer. Architect and code the **Admin Control Panel (CMS)** for the "Antigravity" Next.js Learning Platform.
+
+This is a **secure, protected environment** (`/admin`) where platform administrators manage users, categories, learning content, and AI vector data.
+
+### 🛠️ Technical Stack
+* **Framework:** Next.js 14+ (App Router, Server Actions).
+* **Auth:** NextAuth.js v5 (Credentials Provider).
+* **Database:** Prisma ORM (Postgres).
+* **Forms:** React Hook Form + Zod.
+* **UI:** Tailwind CSS (Dark "Control Room" aesthetic), Lucide React icons, Shadcn/UI-style components.
+* **Editor:** Tiptap (Headless WYSIWYG) for writing lesson content.
+
+### ⚙️ Functional Requirements
+
+1.  **Security & Layout:**
+    * Implement **Middleware** to strictly protect all `/admin/*` routes. Redirect unauthenticated users to `/admin/login`.
+    * Create a persistent **Admin Sidebar Layout** containing navigation for Dashboard, Users, Categories, and Courses.
+    * **Login Page:** A minimal, high-security login form (Email/Password).
+
+2.  **Content Management (The Course Builder):**
+    * **Course CRUD:** Create/Edit courses, upload thumbnails, assign Categories.
+    * **Lesson Editor:** A rich-text editor (Tiptap) supporting markdown, code blocks, and images.
+    * **Draft System:** Toggle content between `Draft` and `Published`. Drafts are invisible on the public site.
+
+3.  **AI & Vector Management:**
+    * **"Sync Embeddings" Action:** A server action button in the dashboard that:
+        1.  Fetches all *published* lessons.
+        2.  Generates new embeddings via OpenAI.
+        3.  Updates the `pgvector` column in Postgres.
+        4.  Displays a success toast/notification.
+
+### 📦 Deliverables
+Please provide the following production-ready code:
+
+1.  **File Structure:** The specific tree for `app/(admin)`.
+2.  **Auth Implementation:** `auth.ts` config and the Middleware matcher.
+3.  **Server Actions:**
+    * `actions/cms.ts`: Logic for creating/updating Lessons and Courses.
+    * `actions/ai.ts`: The logic to sync vector embeddings.
+4.  **UI Components:**
+    * **RichTextEditor.tsx:** A robust Tiptap wrapper.
+    * **AdminLayout.tsx:** The sidebar shell.
+    * **CourseTable.tsx:** A data table listing courses with status badges (Draft/Published).
+
+**Tone:** The UI should feel like a "Mission Control" cockpit—dark grays, monospaced data fonts, high information density, and utilitarian neon accents.
