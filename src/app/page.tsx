@@ -1,8 +1,8 @@
 import prisma from "@/lib/prisma";
 import { CategoryCard } from "@/components/CategoryCard";
-import { HeroSection } from "./components/HeroSection";
-import { FeaturedCourses } from "./components/FeaturedCourses";
-import { Footer } from "./components/Footer";
+import { HeroSection } from "@/app/components/HeroSection";
+import { FeaturedCourses } from "@/app/components/FeaturedCourses";
+import { Footer } from "@/app/components/Footer";
 
 export const dynamic = "force-dynamic";
 

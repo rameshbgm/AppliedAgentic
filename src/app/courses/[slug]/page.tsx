@@ -1,8 +1,8 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CourseHero } from "./components/CourseHero";
-import { LessonList } from "./components/LessonList";
+import { CourseHero } from "@/app/courses/[slug]/components/CourseHero";
+import { LessonList } from "@/app/courses/[slug]/components/LessonList";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +34,6 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
             <LessonList
                 lessons={course.lessons}
                 courseSlug={course.slug}
-                categoryColor={course.category.color}
             />
         </div>
     );

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
-import { CoursesTable } from "./components/CoursesTable";
+import { CoursesTable } from "@/app/admin/courses/components/CoursesTable";
 
 export const dynamic = "force-dynamic";
 

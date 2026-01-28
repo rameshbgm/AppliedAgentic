@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { LessonReader } from "./components/LessonReader";
+import { LessonReader } from "@/app/courses/[slug]/[lessonSlug]/components/LessonReader";
 
 export const dynamic = "force-dynamic";
 

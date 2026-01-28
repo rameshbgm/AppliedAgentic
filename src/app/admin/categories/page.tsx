@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { CategoriesGrid } from "./components/CategoriesGrid";
+import { CategoriesGrid } from "@/app/admin/categories/components/CategoriesGrid";
 
 export const dynamic = "force-dynamic";
 

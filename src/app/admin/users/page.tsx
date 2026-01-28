@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { UsersTable } from "./components/UsersTable";
+import { UsersTable } from "@/app/admin/users/components/UsersTable";
 
 export const dynamic = "force-dynamic";
 

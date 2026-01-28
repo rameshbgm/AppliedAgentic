@@ -1,8 +1,8 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CategoryHero } from "./components/CategoryHero";
-import { CourseList } from "./components/CourseList";
+import { CategoryHero } from "@/app/category/[slug]/components/CategoryHero";
+import { CourseList } from "@/app/category/[slug]/components/CourseList";
 
 export const dynamic = "force-dynamic";
 

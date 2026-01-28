@@ -1,8 +1,8 @@
 import prisma from "@/lib/prisma";
-import { SyncButton } from "./sync-button";
-import { DashboardStats } from "./components/DashboardStats";
-import { QuickActions } from "./components/QuickActions";
-import { RecentActivity } from "./components/RecentActivity";
+import { SyncButton } from "@/app/admin/sync-button";
+import { DashboardStats } from "@/app/admin/components/DashboardStats";
+import { QuickActions } from "@/app/admin/components/QuickActions";
+import { RecentActivity } from "@/app/admin/components/RecentActivity";
 
 export const dynamic = "force-dynamic";
 
